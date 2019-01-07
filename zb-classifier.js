@@ -958,6 +958,29 @@ class ZigbeeClassifier {
     );
   }
 
+  addRelativeHumiditySensorProperty(node, msRelativeHumidityEndpoint) {
+    this.addProperty(
+      node,                           // device
+      'humidity',                     // name
+      {                               // property description
+        '@type': 'HumidityProperty',
+        label: 'Humidity',
+        type: 'number',
+        unit: 'percent',
+        minimum: 0,
+        maximum: 100,
+        readOnly: true,
+      },
+      PROFILE_ID.ZHA,                 // profileId
+      msRelativeHumidityEndpoint,     // endpoint
+      CLUSTER_ID.RELATIVE_HUMIDITY,   // clusterId
+      'measuredValue',                // attr
+      '',                             // setAttrFromValue
+      'parseNumericHundredthsAttr',   // parseValueFromAttr
+      CONFIG_REPORT_INTEGER
+    );
+  }
+
   addThermostatProperties(node, hvacThermostatEndpoint,
                           hvacFanControlEndpoint) {
     this.addProperty(
@@ -1516,6 +1539,8 @@ class ZigbeeClassifier {
         CLUSTER_ID.OCCUPANCY_SENSOR_HEX);
     const msTemperatureEndpoint =
       node.findZhaEndpointWithInputClusterIdHex(CLUSTER_ID.TEMPERATURE_HEX);
+    const msRelativeHumidityEndpoint =
+      node.findZhaEndpointWithInputClusterIdHex(CLUSTER_ID.RELATIVE_HUMIDITY_HEX);
     const hvacThermostatEndpoint =
       node.findZhaEndpointWithInputClusterIdHex(CLUSTER_ID.HVACTHERMOSTAT_HEX);
     const hvacFanControlEndpoint =
@@ -1574,6 +1599,7 @@ class ZigbeeClassifier {
       console.log('         lightLinkEndpoint =', lightLinkEndpoint);
       console.log('msOccupancySensingEndpoint =', msOccupancySensingEndpoint);
       console.log('     msTemperatureEndpoint =', msTemperatureEndpoint);
+      console.log('msRelativeHumidityEndpoint =', msRelativeHumidityEndpoint);
       console.log('       genPowerCfgEndpoint =', genPowerCfgEndpoint);
       console.log('  genDeviceTempCfgEndpoint =', genDeviceTempCfgEndpoint);
       console.log('                  zoneType =', node.zoneType);
@@ -1583,6 +1609,9 @@ class ZigbeeClassifier {
       this.addTemperatureSensorProperty(node, msTemperatureEndpoint);
     } else if (genDeviceTempCfgEndpoint) {
       this.addDeviceTemperatureProperty(node, genDeviceTempCfgEndpoint);
+    }
+    if (msRelativeHumidityEndpoint) {
+      this.addRelativeHumiditySensorProperty(node, msRelativeHumidityEndpoint);
     }
     if (illuminanceEndpoint) {
       this.addIlluminanceMeasurementProperty(node, illuminanceEndpoint);
